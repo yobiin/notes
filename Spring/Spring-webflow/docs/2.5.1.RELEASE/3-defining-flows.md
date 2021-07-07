@@ -99,7 +99,199 @@
 </flow>
 ~~~
 
-### 3.6. 动作(Actions)
+### 3.6. 操作(Actions)
+
+大多数时候流程(Flow)不仅仅需要表达视图导航逻辑，它们也需要调用应用的业务服务或者其它操作。通常，一个流程里面有几个点可以执行操作，如下所示：
+
+* 在流程开始时（On flow start）
+* 在状态入口（On state entry）
+* 在视图渲染时（On view render）
+* 在转换执行时（On transition execution）
+* 在状态退出时（On state exit）
+* 在流程结束时（On flow end）
+
+这些操作使用简洁的表达式语言进行定义，Spring Web Flow 默认使用“Unified EL”表达式定义操作。接下来的几节将介绍定义操作的基本语言元素。
+
+#### 3.6.1. evaluate
+
+最常使用的操作元素是`evaluate`元素。你可以使用`evaluate`元素在流程的某个节点处对表达式求值。通过这个标签你可以调用 Spring beans 中的方法或者流程中的其它变量，如下所示：
+
+~~~xml
+<evaluate expression="entityManager.persist(booking)" />
+~~~
+
+ ##### 保存计算结果
+
+如果表达式有返回值，那么我们可以把这个值保存到一个叫做`flowScope`的流程数据模型中，如下所示：
+
+~~~xml
+<evaluate expression="bookingService.findHotels(searchCriteria)" result="flowScope.hotels" />
+~~~
+
+##### 转换计算结果
+
+如果表达式返回值需要转换，你可以使用`result-type`属性指定要转换的值类型，如下所示：
+
+~~~xml
+<evaluate expression="bookingService.findHotels(searchCriteria)" result="flowScope.hotels" result-type="dataModel"/>
+~~~
+
+#### 3.6.2. 检查点：流程操作
+
+现在回顾一下添加了操作的酒店预订流程示例：
+
+~~~xml
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+
+    <input name="hotelId" />
+
+    <on-start>
+        <evaluate expression="bookingService.createBooking(hotelId, currentUser.name)"
+                  result="flowScope.booking" />
+    </on-start>
+
+    <view-state id="enterBookingDetails">
+        <transition on="submit" to="reviewBooking" />
+    </view-state>
+
+    <view-state id="reviewBooking">
+        <transition on="confirm" to="bookingConfirmed" />
+        <transition on="revise" to="enterBookingDetails" />
+        <transition on="cancel" to="bookingCancelled" />
+    </view-state>
+
+    <end-state id="bookingConfirmed" />
+
+    <end-state id="bookingCancelled" />
+
+</flow>
+~~~
+
+如上所示，流程在开始的时候创建了一个预订对象，然后把它保存到`flowScope`模型中。酒店ID`hoteId`通过一个流程输入属性（后面讲解该属性）获得。
+
+### 3.7. 输入/输出映射
+
+每一个流程都有一个定义良好的输入/输出契约。可以在流程开始时传递输入属性，也可以在流程结束时返回输出属性。在这方面，调用流程在概念上类似于调用带有以下签名的方法：
+
+~~~java
+FlowOutcome flowId(Map<String, Object> inputAttributes);
+~~~
+
+上面的`FlowOutcome`具有以下的签名：
+
+~~~java
+public interface FlowOutcome {
+   public String getName();
+   public Map<String, Object> getOutputAttributes();
+}
+~~~
+
+#### 3.7.1. input
+
+使用`input`元素来声明一个流程输入属性：
+
+~~~xml
+<input name="hotelId" />
+~~~
+
+输入的值以属性名作为键值保存在`flowScope`。如上所示，酒店ID将以`hoteId`作为键值保存在`flowScope`。
+
+##### 声明输入类型
+
+使用`type`属性声明输入属性的类型，如下所示：
+
+~~~
+<input name="hotelId" type="long" />
+~~~
+
+如果输入值与声名的类型不匹配，则尝试进行类型转换。
+
+##### 分配输入值
+
+使用`value`属性指定一个表达式，该表达式将接收输入值，如下所示：
+
+~~~
+<input name="hotelId" value="flowScope.myParameterObject.hotelId" />
+~~~
+
+如果可以确定表达式的值类型，那么如果没有指定类型属性，则该元数据将用于强制类型转换。
+
+##### 标识输入值是必须的
+
+使用`required`属性来强制输入值不能等于NULL或者空串，如下所示：
+
+~~~xml
+<input name="hotelId" type="long" value="flowScope.hotelId" required="true" />
+~~~
+
+### 3.7.2. output
+
+使用`output`元素来声明一个流程输出属性。输出属性在`end-state`标签内声明，用于表示特定流程的执行结果，如下所示：
+
+~~~xml
+<end-state id="bookingConfirmed">
+    <output name="bookingId" />
+</end-state>
+~~~
+
+输出值通过元素的名称在`flowScope`中获取。如上所示，输出值需是存储在`flowScope`中名称为`bookingId`的变量的值。
+
+##### 指定输出值的来源
+
+使用`value`属性来表示一个特定的输出值表达式，如下所示：
+
+~~~xml
+<output name="confirmationNumber" value="booking.confirmationNumber" />
+~~~
+
+### 3.7.3. 检查点：输入/输出映射
+
+现在回顾一下添加了输入/输出映射的酒店预订流程示例：
+
+~~~xml
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+
+    <input name="hotelId" />
+
+    <on-start>
+        <evaluate expression="bookingService.createBooking(hotelId, currentUser.name)"
+                  result="flowScope.booking" />
+    </on-start>
+
+    <view-state id="enterBookingDetails">
+        <transition on="submit" to="reviewBooking" />
+    </view-state>
+
+    <view-state id="reviewBooking">
+        <transition on="confirm" to="bookingConfirmed" />
+        <transition on="revise" to="enterBookingDetails" />
+        <transition on="cancel" to="bookingCancelled" />
+    </view-state>
+
+    <end-state id="bookingConfirmed" >
+        <output name="bookingId" value="booking.id"/>
+    </end-state>
+
+    <end-state id="bookingCancelled" />
+
+</flow>
+~~~
+
+如上所示，流程接收一个`hoteId`的输入属性，并且当一个新的预订被确认时返回一个`bookingId`输出属性。
+
+
+
+
+
+
+
+
 
 
 
