@@ -90,7 +90,7 @@
     <script type="text/javascript">
         $(function() {
             
-            $.get('./notes/blob/main/Spring/Spring-webflow/docs/2.5.1.RELEASE/1-introduction.md', function(response, status, xhr){
+            $.get('/blob/main/Spring/Spring-webflow/docs/2.5.1.RELEASE/1-introduction.md', function(response, status, xhr){
                 $(".text").html(marked(response));
             });
 
