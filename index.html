@@ -23,54 +23,41 @@
           <ul class="list-unstyled ps-0">
             <li class="mb-1">
               <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
-                Home
+                Spring
               </button>
               <div class="collapse show" id="home-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li><a href="#" class="link-dark rounded">Overview</a></li>
-                  <li><a href="#" class="link-dark rounded">Updates</a></li>
-                  <li><a href="#" class="link-dark rounded">Reports</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-                Dashboard
-              </button>
-              <div class="collapse" id="dashboard-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li><a href="#" class="link-dark rounded">Overview</a></li>
-                  <li><a href="#" class="link-dark rounded">Weekly</a></li>
-                  <li><a href="#" class="link-dark rounded">Monthly</a></li>
-                  <li><a href="#" class="link-dark rounded">Annually</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="mb-1">
-              <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                Orders
-              </button>
-              <div class="collapse" id="orders-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li><a href="#" class="link-dark rounded">New</a></li>
-                  <li><a href="#" class="link-dark rounded">Processed</a></li>
-                  <li><a href="#" class="link-dark rounded">Shipped</a></li>
-                  <li><a href="#" class="link-dark rounded">Returned</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="border-top my-3"></li>
-            <li class="mb-1">
-              <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                Account
-              </button>
-              <div class="collapse" id="account-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li><a href="#" class="link-dark rounded">New...</a></li>
-                  <li><a href="#" class="link-dark rounded">Profile</a></li>
-                  <li><a href="#" class="link-dark rounded">Settings</a></li>
-                  <li><a href="#" class="link-dark rounded">Sign out</a></li>
-                </ul>
+                    <li>
+                        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#Spring-webflow" aria-expanded="true">
+                            Spring-webflow
+                          </button>
+                        <div class="collapse show" id="Spring-webflow">
+                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                <li>
+                                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#Spring-webflow-docs" aria-expanded="true">
+                                        docs
+                                    </button>
+                                    <div class="collapse show" id="Spring-webflow-docs">
+                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                            <li>
+                                                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#Spring-webflow-docs-251RELEASE" aria-expanded="true">
+                                                    2.5.1.RELEASE
+                                                </button>
+                                                <div class="collapse show" id="Spring-webflow-docs-251RELEASE">
+                                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                                        <li><a href="javascript:renderMdFile('./Spring/Spring-webflow/docs/2.5.1.RELEASE/1-introduction.md')" class="link-dark rounded">1-introduction</a></li>
+                                                        <li><a href="javascript:renderMdFile('./Spring/Spring-webflow/docs/2.5.1.RELEASE/2-whatsnew.md')" class="link-dark rounded">2-whatsnew</a></li>
+                                                        <li><a href="javascript:renderMdFile('./Spring/Spring-webflow/docs/2.5.1.RELEASE/3-defining-flows.md')" class="link-dark rounded">3-defining-flows</a></li>
+                                                      </ul>
+                                                </div>
+                                            </li>
+                                          </ul>
+                                    </div>
+                                </li>
+                              </ul>
+                        </div>
+                    </li>
+                  </ul>
               </div>
             </li>
           </ul>
@@ -91,11 +78,15 @@
 
     <script type="text/javascript">
         $(function() {
-            
-            $.get('./Spring/Spring-webflow/docs/2.5.1.RELEASE/1-introduction.md', function(response, status, xhr){
-                $(".text").html(marked(response));
-                hljs.highlightAll();
-            });
+
+            window.renderMdFile = function(uri) {
+                $.get(uri, function(response, status, xhr){
+                    $(".text").html(marked(response));
+                    hljs.highlightAll();
+                });
+            };
+
+            window.renderMdFile('./Spring/Spring-webflow/docs/2.5.1.RELEASE/1-introduction.md');
 
         });
     </script>
